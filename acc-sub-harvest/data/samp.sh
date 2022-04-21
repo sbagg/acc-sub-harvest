@@ -1,1 +1,0 @@
-SELECT * FROM kc_cups_dates;
