@@ -10,7 +10,7 @@
 ## Potential Manipulation of data can take place later 
 ## on as functionality expands
 ##
-## ONLY FOR CSV AT THE MOMENT
+## ONLY FOR CSV or JSON AT THE MOMENT
 ##
 ##
 ##
@@ -19,23 +19,42 @@
 #!/bin/bash 
 
 kc_cups(){
-    # original csv data form
-    psql acc -c "\copy kc_cups (id, type, kc0, kc1, kcMid, earlyT, lateT, midT, label) FROM '$1' DELIMITER ',' CSV HEADER;"
+    if [[ $2 -eq "csv" ]] 
+    then
+      psql acc -c "\copy kc_cups (id, type, kc0, kc1, kcMid, earlyT, lateT, midT, label) FROM '$1' DELIMITER ',' CSV HEADER;"
+    else 
+      psql acc -c "\copy kc_cups (id, type, kc0, kc1, kcMid, earlyT, lateT, midT, label) FROM '$1';"
+    fi  
 }
 
 kc_cups_dates(){
     # original csv data form
-    psql acc -c "\copy kc_cups_dates (key, type, id, start_date, end_date, region) FROM '$1' DELIMITER ',' CSV HEADER;"
+    if [[ $2 -eq "csv" ]] 
+    then
+      psql acc -c "\copy kc_cups_dates (key, type, id, start_date, end_date, region) FROM '$1' DELIMITER ',' CSV HEADER;"
+    else 
+      psql acc -c "\copy kc_cups_dates (key, type, id, start_date, end_date, region) FROM '$1';"
+    fi 
 }
 
 grid(){
     # original csv data form
-    psql acc -c "\copy grid (id, type, cover, start_date, end_date, region) FROM '$1' DELIMITER ',' CSV HEADER;"
+    if [[ $2 -eq "csv" ]] 
+    then
+      psql acc -c "\copy grid (id, type, cover, start_date, end_date, region) FROM '$1' DELIMITER ',' CSV HEADER;"
+    else 
+      psql acc -c "\copy grid (id, type, cover, start_date, end_date, region) FROM '$1';"
+    fi 
 }
 
 eto(){
     # original csv data form
-    psql acc -c "\copy eto (id, type, cover, start_date, end_date, region) FROM '$1' DELIMITER ',' CSV HEADER;"
+    if [[ $2 -eq "csv" ]] 
+    then
+      psql acc -c "\copy eto (id, type, cover, start_date, end_date, region) FROM '$1' DELIMITER ',' CSV HEADER;"
+    else 
+      psql acc -c "\copy eto (id, type, cover, start_date, end_date, region) FROM '$1';"
+    fi 
 }
 
 
@@ -43,9 +62,10 @@ sample(){
     echo "This is a sample: $1"
 }
 
-while getopts f: flag
+while getopts c:f: flag
 do
     case "${flag}" in
+        c) csv=1;;
         f) file=${OPTARG};;
     esac
 done
@@ -58,23 +78,25 @@ file_name="../data/$file"
 #########################################
 #python3 -c "import format; format.csv()"
 
+
 case "$3" in
   kc_cups) 
-    kc_cups "$file_name" ;;
-  kc_cups_dates)  
-    kc_cups_dates "$file_name" ;;
+    if "${csv}" -eq 1 then kc_cups "$file_name" "csv"; else  kc_cups "$file_name"; fi ;;   
+  kc_cups_dates) 
+    if "${csv}" -eq 1 then kc_cups_dates "$file_name" "csv"; else  kc_cups_dates "$file_name"; fi ;;    
   grid) 
-    grid "$file_name" ;;
+    if "${csv}" -eq 1 then grid "$file_name" "csv"; else  grid "$file_name"; fi ;;   
   eto) 
-    eto "$file_name" ;;
+    if "${csv}" -eq 1 then eto "$file_name" "csv"; else  eto "$file_name"; fi ;;   
   sample) 
-    sample "$file_name" ;;
+    if "${csv}" -eq 1 then sample "$file_name" "csv"; else  sample "$file_name"; fi ;;   
   *) echo "No harvest table verified! Add kc_cups, kc_cups_dates, grid, eto.  Run in order kc_cups, kc_cups_dates, eto, grid";;
 esac
 
 
+
 ##
-##
+## 
 ##
 ##
 ##

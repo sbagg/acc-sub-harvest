@@ -1,17 +1,17 @@
 #!/bin/bash  
 
 
-create() {
+create_local() {
     echo "Starting Creation of Tables...."
-    while getopts n:u: flag
+    while getopts u: flag
     do
         case "${flag}" in
             u) user=${OPTARG};;
-            n) name=${OPTARG};;
         esac
     done
-    # psql -tc "SELECT 1 FROM pg_database WHERE datname = '$name'" | grep -q 1 | psql -U postgres -c "CREATE DATABASE $name"
+    $name= "acc"
 
+    # psql -tc "SELECT 1 FROM pg_database WHERE datname = '$name'" | grep -q 1 | psql -U postgres -c "CREATE DATABASE $name"
     if [ "$( psql -tAc "SELECT 1 FROM pg_database WHERE datname='$name'" )" = '1' ]
     then
         echo "The database $name already exists.  Starting table creation."
@@ -46,42 +46,83 @@ create() {
 
 }
 
-# insert_calc() {
-
-# }
-
-# retrieve() {
-
- #run_equation -q sample -D 25 -e 44 -s Sabrina
-
-# }
-
-run_equation(){
-    echo "Starting Equation Call..."
-    
-    while getopts q:E:D:d:N:e:k:s: flag
+connect_instance() {
+    while getopts p: flag
     do
         case "${flag}" in
-            q) equation=${OPTARG};;
-            E) E=${OPTARG};;
-            D) D=${OPTARG};;
-            d) d=${OPTARG};;
-            N) N=${OPTARG};;
-            e) et=${OPTARG};;
-            k) kc=${OPTARG};;
-            s) sample=${OPTARG};;
+            p) password=${OPTARG};;
         esac
     done
+    # psql "sslmode=disable dbname=postgres user=postgres hostaddr=INSTANCE_IP"
 
-    if [ -z "$equation" ]
-    then
-        echo "Equation is not input....Exiting Program"
-        exit 125
-    fi
-
-    val=$(node functions.js --equation=$equation ${sample:+--sample=$sample} ${E:+--E=$E} ${D:+--D=$D} ${d:+--d=$d} ${N:+--N=$N} ${et:+--et=$et} ${kc:+--kc=$kc})
-
-    #insert_calc $val $equation
 }
+
+# }
+
+retrieve() {
+    if [[ $1 -eq "kc_cups" ]]
+    then
+        if [ "$2" -eq "csv" ]
+        then
+        psql acc -c "\copy kc_cups to '../data/output/kc_cups.csv' csv header"
+        else
+        psql acc -c "\copy kc_cups to '../data/output/kc_cups.json'"
+        fi
+    elif [[ $1 -eq "kc_cups_dates" ]]
+    then
+        if [ "$2" -eq "csv" ]
+        then
+        psql acc -c "\copy kc_cups_dates to '../data/output/kc_cups_dates.csv' csv header"
+        else
+        psql acc -c "\copy kc_cups_dates to '../data/output/kc_cups_dates.json'"
+        fi
+    elif [[ $1 -eq "grid" ]]
+    then
+        if [ "$2" -eq "csv" ]
+        then
+        psql acc -c "\copy grid to '../data/output/grid.csv' csv header"
+        else
+        psql acc -c "\copy grid to '../data/output/grid.json'"
+        fi
+    elif [[ $1 -eq "eto" ]]
+    then
+        if [ "$2" -eq "csv" ]
+        then
+        psql acc -c "\copy eto to '../data/output/eto.csv' csv header"
+        else
+        psql acc -c "\copy eto to '../data/output/eto.json'"
+        fi
+    else
+    echo "This is not one of the accessible tables; choose from kc_cups, kc_cups_dates, grid, or eto."
+    fi
+}
+
+# run_equation(){
+#     echo "Starting Equation Call..."
+    
+#     while getopts q:E:D:d:N:e:k:s: flag
+#     do
+#         case "${flag}" in
+#             q) equation=${OPTARG};;
+#             E) E=${OPTARG};;
+#             D) D=${OPTARG};;
+#             d) d=${OPTARG};;
+#             N) N=${OPTARG};;
+#             e) et=${OPTARG};;
+#             k) kc=${OPTARG};;
+#             s) sample=${OPTARG};;
+#         esac
+#     done
+
+#     if [ -z "$equation" ]
+#     then
+#         echo "Equation is not input....Exiting Program"
+#         exit 125
+#     fi
+
+#     val=$(node functions.js --equation=$equation ${sample:+--sample=$sample} ${E:+--E=$E} ${D:+--D=$D} ${d:+--d=$d} ${N:+--N=$N} ${et:+--et=$et} ${kc:+--kc=$kc})
+
+#     #insert_calc $val $equation
+# }
 
 "$@"

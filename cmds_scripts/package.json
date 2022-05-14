@@ -5,7 +5,9 @@
   "main": "functions.js",
   "dependencies": {
     "minimist": "^1.2.5",
-    "node-pandas": "^1.0.5"
+    "node-pandas": "^1.0.5",
+    "pg": "^8.7.3",
+    "postgresql-client": "^2.0.0"
   },
   "devDependencies": {},
   "scripts": {
